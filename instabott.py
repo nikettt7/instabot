@@ -92,7 +92,7 @@ def get_own_post():
             image_name = own_media['data'][0]['id'] + '.jpeg'
             image_url = own_media['data'][0]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url, image_name)
-            cprint('Your image has been downloaded!', 'blue')
+            print('Your image has been downloaded!', 'blue')
         else:
             print 'Post does not exist!'
     else:
@@ -117,14 +117,14 @@ def get_user_post(insta_username):
             # urllib is used to fetch data across world wide web .
             # urllib library is installed using command pip install urllib
             urllib.urlretrieve(image_url, image_name)
-            cprint('user image has been downloaded!', 'blue')
+            print('user image has been downloaded!', 'blue')
         else:
             print 'Post does not exist!'
     else:
         print 'Status code other than 200 received!'
 
 
-# get_post_id function will help us to get media id on which we can add like or comment
+# get_post_id function to get media id to add like or comment
 def get_post_id(insta_username):
     # Here we are calling GET_USER_ID function to get user id
     user_id = get_user_id(insta_username)
@@ -235,7 +235,7 @@ def list_of_comments(insta_username):
         print 'status code error'
 
 
-# let us define a function which will delete negative comments on posts of any user
+# function to delete negative comments on recent posts
 def delete_negative_comment(insta_username):
     # here we are  calling get post id function
     media_id = get_post_id(insta_username)
@@ -270,9 +270,7 @@ def delete_negative_comment(insta_username):
         print 'Status code other than 200 received!'
 
 
-# let us create a function to fetch users post in a creative way asking the criteria from the user through the console
-# choose the post in a creative way
-# this function will aloow the user to enter a username and he post no which user want to access or fetch..
+# function to fetch users any post
 def get_media_of_your_choice(insta_username):
     user_id = get_user_id(insta_username)
     if user_id == None:
@@ -281,9 +279,8 @@ def get_media_of_your_choice(insta_username):
     user_media = requests.get(request_url).json()
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
-            # here we will ask for the post number which we want to get.
+            #post number which we want to get.
             post_number = raw_input("enter no of post which you want : ")
-            # python takes input as string it must be converted to integer using int type.
             post_number = int(post_number)
             # list has zero based indexing do data entered must be subtracted from 1 so as to get actual data entered.
             x = post_number - 1
@@ -296,14 +293,43 @@ def get_media_of_your_choice(insta_username):
     else:
         print 'status code error'
 
+def target_comments(insta_username):
+    user_id = get_user_id(insta_username)
+    if user_id == None:
+        print 'User does not exist!'
+        exit()
 
-# start bot function which will start or bot application
-def go():
+    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s' % (user_id, APP_ACCESS_TOKEN))
+    user_media = requests.get(request_url).json()
+    if user_media['meta']['code'] == 200:
+        if len(user_media['data']['text']):
+            for x in range(0, len(user_media['data']['text'])):
+                caption= user_media['data'][x]['text']
+                split_caption = caption.split()
+                for words in split_caption:
+
+                    if words == '#fun' or words == '#adventure' or words == '#trip':
+                        payload = {"access_token": APP_ACCESS_TOKEN, "text": "https://goo.gl/Hq4SVe"}
+                        print 'POST request url : %s' % (request_url)
+                        make_comment = requests.post(request_url, payload).json()
+                        if make_comment['meta']['code'] == 200:
+                            print 'comment has been posted successfully!'
+                    else:
+                        print 'Your comment was unsuccessful. please Try again!'
+                else:
+                    print "Not our markettable person"
+        else:
+            print"No caption exists!"
+    else:
+        print"meta code other than 200 recieved."
+
+
+def main():#main function which will start
     # while loop in  python is used to repeatedly execute a set a target statements as listed below
     while True:
         print '\n'
         # cprint is used for colored printing of a string
-        cprint('Hello! Welcome to instaBot!\n', 'blue')
+        cprint( 'Hello! Welcome to instaBot!\n', 'blue')
         cprint('You have following options: \n', 'red')
         print "a.Get your own details.\n"
         print "b.Get details of a user by username.\n"
@@ -316,7 +342,8 @@ def go():
         print "i.get the recent media liked by the user.\n "
         print "j.Delete negative comment.\n "
         print "k.get post of yor choice.\n"
-        print "l.Exit.\n "
+        print "l.Do some Marketing\n "
+        print "m.Exit\n"
         choice = raw_input("Enter you choice: ")
         if choice == "a":
             self_info()
@@ -351,9 +378,12 @@ def go():
             insta_username = raw_input("enter username of the user : ")
             get_media_of_your_choice(insta_username)
         elif choice == 'l':
+            insta_username = raw_input("Enter the username: \n")
+            target_comments(insta_username)
+        elif choice == 'm':
             exit()
         else:
             cprint("wrong choice", 'green')
 
 
-go() #finally executing
+main() #finally executing
