@@ -173,7 +173,7 @@ def like_a_post(insta_username):
     request_url = (BASE_URL + 'media/%s/likes') % (media_id)
 
     #  Access Token is sent in payload to authenticate the like that we're making.
-    # payload act as a data handler  from whiere data is passed
+    # payload act as a data handler  from where data is passed
     payload = {"access_token": APP_ACCESS_TOKEN}
     print 'POST request url : %s' % (request_url)
     post_a_like = requests.post(request_url, payload).json()
@@ -293,36 +293,42 @@ def get_media_of_your_choice(insta_username):
     else:
         print 'status code error'
 
-def target_comments(insta_username):
+def target_caption_comments(insta_username):
     user_id = get_user_id(insta_username)
-    if user_id == None:
-        print 'User does not exist!'
-        exit()
+    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    caption_info = requests.get(request_url).json()
 
-    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s' % (user_id, APP_ACCESS_TOKEN))
-    user_media = requests.get(request_url).json()
-    if user_media['meta']['code'] == 200:
-        if len(user_media['data']['text']):
-            for x in range(0, len(user_media['data']['text'])):
-                caption= user_media['data'][x]['text']
-                split_caption = caption.split()
-                for words in split_caption:
+    if caption_info['meta']['code'] == 200:
 
-                    if words == '#fun' or words == '#adventure' or words == '#trip':
-                        payload = {"access_token": APP_ACCESS_TOKEN, "text": "https://goo.gl/Hq4SVe"}
-                        print 'POST request url : %s' % (request_url)
-                        make_comment = requests.post(request_url, payload).json()
-                        if make_comment['meta']['code'] == 200:
-                            print 'comment has been posted successfully!'
+        if len(caption_info['data']):
+
+            for y in range(0, len(caption_info['data'])):
+
+                caption_text = caption_info['data'][y]['caption']['text']
+                caption = caption_text.split(" ")
+                if 'Shopping' in caption:
+
+                    print 'Read Caption: %s' % (caption)
+                    media_id = get_post_id(insta_username)
+                    comment_text = "AMAZON Monday Deals Week. Get your free gift card worth 5000. Only a few days left!. Get it "
+                    payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_text}
+                    request_url = (BASE_URL + 'media/%s/comments') % (media_id)
+                    print 'POST request url : %s' % (request_url)
+
+                    make_comment = requests.post(request_url, payload).json()
+
+                    if make_comment['meta']['code'] == 200:
+                        print "Successfully Posted Targetted Comment!"
                     else:
-                        print 'Your comment was unsuccessful. please Try again!'
+                        print "Unable to add comment. Try again!"
                 else:
-                    print "Not our markettable person"
-        else:
-            print"No caption exists!"
-    else:
-        print"meta code other than 200 recieved."
+                    print 'There is no caption on the post!'
 
+        else:
+
+            print 'Status code other than 200 received!'
+exit()
 
 def main():#main function which will start
     # while loop in  python is used to repeatedly execute a set a target statements as listed below
@@ -379,7 +385,7 @@ def main():#main function which will start
             get_media_of_your_choice(insta_username)
         elif choice == 'l':
             insta_username = raw_input("Enter the username: \n")
-            target_comments(insta_username)
+            target_caption_comments(insta_username)
         elif choice == 'm':
             exit()
         else:
