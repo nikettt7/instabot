@@ -2,24 +2,23 @@ import requests, urllib
 #  access token owner : md.pup
 #   sandbox users : kajalangural , dimpleverma3803
 
-# For Sentiment Analysis in Python, we use the library TextBlob.
+# For Sentiment Analysis the library TextBlob is used
 from textblob import TextBlob
-# we need to import the text blob library and the classifier for sentiment analysis
+# imported the classifier for sentiment analysis
 from textblob.sentiments import NaiveBayesAnalyzer
 
-# App access token is imported from key file. it can also be created here!
+# App access token is imported from key file
 from client_id import APP_ACCESS_TOKEN
 
 from termcolor import *
 
 
-# We have BASE URL in global variable whose lifetime is runtime of the program
+# BASE URL in global variable
 BASE_URL = 'https://api.instagram.com/v1/'
 
 
 # Function declaration to get your own info
 def self_info():
-    # here user/self is the path for the functionality and access toke is the query string
     request_url = (BASE_URL + 'users/self/?access_token=%s') % APP_ACCESS_TOKEN
 
     # this will print the request url
@@ -28,7 +27,7 @@ def self_info():
     # .json is used while handling json data .it act as a json decoder.
     user_info = requests.get(request_url).json()
 
-    # jsn objects received are displayed in this format which is done by using concept of string formatting.
+
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
             print 'Username: %s' % (user_info['data']['username'])
@@ -42,13 +41,13 @@ def self_info():
 
 
 # Function declaration to get the ID of a user by username
-# Which takes the Instagram username as an input and returns the user ID of the user.
+
 def get_user_id(insta_username):
     request_url = (BASE_URL + 'user''s/search?q=%s&access_token=%s') % (insta_username, APP_ACCESS_TOKEN)
     print 'GET request url : %s' % request_url
     user_info = requests.get(request_url).json()
 
-    # len function checks if the length of data is invalid or not i.e nuLL or not null
+
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
             return user_info['data'][0]['id']
@@ -60,7 +59,7 @@ def get_user_id(insta_username):
 
 
 # Function declaration to get the info of a user by username
-# which takes the instagram username as input and returns the information of the user.
+
 def get_user_info(insta_username):
     user_id = get_user_id(insta_username)
     if user_id == None:
@@ -72,7 +71,7 @@ def get_user_info(insta_username):
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
 
-            # here string formatting is done to increase readability which is the zen of python
+
             print 'Username: %s' % (user_info['data']['username'])
             print 'No. of followers: %s' % (user_info['data']['counts']['followed_by'])
             print 'No. of people you are following: %s' % (user_info['data']['counts']['follows'])
@@ -83,7 +82,7 @@ def get_user_info(insta_username):
         print 'Status code other than 200 received!'
 
 
-# let us define a function to get id of self id's recent post and download the image
+#function to own's recent post
 def get_own_post():
     request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % APP_ACCESS_TOKEN
     own_media = requests.get(request_url).json()
@@ -99,7 +98,7 @@ def get_own_post():
         print 'Status code other than 200 received!'
 
 
-# let us define a function to get user recent post id..
+# function to get user recent post id
 def get_user_post(insta_username):
     user_id = get_user_id(insta_username)
     if user_id == None:
@@ -110,12 +109,12 @@ def get_user_post(insta_username):
     user_media = requests.get(request_url).json()
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
-            # downloaded image is saved in a variable image_name
+            # image is saved in a variable image_name
             image_name = user_media['data'][0]['id'] + '.jpeg'
-            # url of the image is provided which is to be downloaded
+            # url of the image is provided to be downloaded
             image_url = user_media['data'][0]['images']['standard_resolution']['url']
             # urllib is used to fetch data across world wide web .
-            # urllib library is installed using command pip install urllib
+
             urllib.urlretrieve(image_url, image_name)
             print('user image has been downloaded!', 'blue')
         else:
@@ -126,7 +125,7 @@ def get_user_post(insta_username):
 
 # get_post_id function to get media id to add like or comment
 def get_post_id(insta_username):
-    # Here we are calling GET_USER_ID function to get user id
+
     user_id = get_user_id(insta_username)
     if user_id == None:
         print 'User does not exist!'
@@ -146,9 +145,7 @@ def get_post_id(insta_username):
         print 'Status code other than 200 received!'
         exit()
 
-
-# function declaration to get the recent media liked by the user.
-#  this function will get media id liked by user and will download the image
+# function to get the recent media liked by the user
 def recent_media_liked():
     request_url = (BASE_URL + 'users/self/media/liked?access_token=%s') % (APP_ACCESS_TOKEN)
     print 'GET request url : %s' % (request_url)
@@ -245,12 +242,12 @@ def delete_negative_comment(insta_username):
 
     if comment_info['meta']['code'] == 200:
         if len(comment_info['data']):
-            # Here's a naive implementation of how to delete the negative comments :)
+
             for x in range(0, len(comment_info['data'])):
                 comment_id = comment_info['data'][x]['id']
                 comment_text = comment_info['data'][x]['text']
                 blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
-                # blob.sentiment will analyse comment if neg > pos it will del the comment using delete request
+
                 if (blob.sentiment.p_neg > blob.sentiment.p_pos):
                     print 'Negative comment : %s' % (comment_text)
                     # url is passed and saved which is used for deleting a comment from post
@@ -279,10 +276,10 @@ def get_media_of_your_choice(insta_username):
     user_media = requests.get(request_url).json()
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
-            #post number which we want to get.
+
             post_number = raw_input("enter no of post which you want : ")
             post_number = int(post_number)
-            # list has zero based indexing do data entered must be subtracted from 1 so as to get actual data entered.
+
             x = post_number - 1
             image_name = user_media['data'][x]['id'] + '.jpeg'
             image_url = user_media['data'][x]['images']['standard_resolution']['url']
@@ -293,8 +290,8 @@ def get_media_of_your_choice(insta_username):
     else:
         print 'status code error'
 
-def target_caption_comments(insta_username):
-    user_id = get_user_id(insta_username)
+def target_caption_comments(insta_username): #takes argument as insta username
+    user_id = get_user_id(insta_username)    #url of tags has been used
     request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
     print 'GET request url : %s' % (request_url)
     caption_info = requests.get(request_url).json()
@@ -353,7 +350,7 @@ def main():#main function which will start
         choice = raw_input("Enter you choice: ")
         if choice == "a":
             self_info()
-        # elif keyword is used while handling with cases having multiple choices
+
         elif choice == "b":
             insta_username = raw_input("Enter the username of the user: ")
             get_user_info(insta_username)
