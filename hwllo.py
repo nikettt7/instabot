@@ -1,3 +1,5 @@
+print "hello!!\n"
+
 import requests, urllib
 #  access token owner : md.pup
 #   sandbox users : kajalangural , dimpleverma3803
@@ -41,7 +43,7 @@ def self_info():
     else:
         print 'Status code other than 200 received!'
 
-
+print "hi\n"
 # Function declaration to get the ID of a user by username
 
 def get_user_id(insta_username):
@@ -327,14 +329,13 @@ def target_comments(insta_username): #takes argument as insta username
         else:
 
             print 'Status code other than 200 received!'
-    exit()
+exit()
 
-
-def main_function():#main function which will start
+def main():#main function which will start
 
     while True:
         print '\n'
-        colorama.init()
+
         # cprint is used for colored printing of a string
         cprint( 'Hello! Welcome to instaBot!\n', 'blue')
         cprint('You have following options: \n', 'red')
@@ -393,4 +394,4 @@ def main_function():#main function which will start
             cprint("wrong choice", 'green')
 
 
-main_function() #finally executing
+main() #finally executing
