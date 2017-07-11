@@ -12,7 +12,6 @@ from client_id import APP_ACCESS_TOKEN
 from termcolor import colored,cprint
 import colorama
 from termcolor import *
-import matplotlib.pyplot as plt
 
 
 
@@ -307,11 +306,10 @@ def target_comments(insta_username): #takes argument as insta username
 
                 caption_text = str(caption_info['data'][y]['caption'])
                 caption = caption_text.split(" ")
-                if 'Park' in caption:
-
+                if "Park" in caption:
                     print 'Read Caption: %s' % (caption)
                     media_id = get_post_id(insta_username)
-                    comment_text = "Get more exciting offers at https://goo.gl/bSHqrw"
+                    comment_text = "Get more exciting offers at"
                     payload = {"access_token": APP_ACCESS_TOKEN, "text": comment_text}
                     request_url = (BASE_URL + 'media/%s/comments') % (media_id)
                     print 'POST request url : %s' % (request_url)
@@ -330,39 +328,6 @@ def target_comments(insta_username): #takes argument as insta username
             print 'Status code other than 200 received!'
     exit()
 
-def pie_chart(insta_username):
-    media_id = get_post_id(insta_username)
-    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
-    comment_info = requests.get(request_url).json()
-
-    if comment_info['meta']['code'] == 200:
-        if len(comment_info['data']):
-
-            for x in range(0, len(comment_info['data'])):
-                comment_id = comment_info['data'][x]['id']
-                comment_text = comment_info['data'][x]['text']
-                blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
-                positive_comment = blob.sentiment.p_pos
-                negative_comment = blob.sentiment.p_neg
-                # Data to plot
-                labels = 'Positive Comment', 'Negative Comment'
-                sizes = [positive_comment,negative_comment]
-                colors = [ 'yellowgreen', 'lightcoral',]
-                explode = ( 0, 0)
-
-                # Plot
-                plt.pie(sizes, explode=explode, labels=labels, colors=colors,
-                        autopct='%1.1f%%', shadow=True, startangle=140)
-
-                plt.axis('equal')
-                plt.show()
-
-        else:
-            print 'There are no existing comments on the post!'
-    else:
-        print 'Status code other than 200 received!'
-
 
 def main_function():#main function which will start
 
@@ -380,12 +345,11 @@ def main_function():#main function which will start
         print "f.get list of likes on post\n"
         print "g.Comment on user recent post.\n "
         print "h.get list of comments on post\n"
-        print "i.get the recent media liked by self.\n "
+        print "i.get the recent media liked by the user.\n "
         print "j.Delete negative comment.\n "
         print "k.get post of yor choice.\n"
         print "l.Do some Marketing\n "
-        print "m.Get a pie chart of positive and negative comments.\n"
-        print "n.Exit\n"
+        print "m.Exit\n"
         choice = raw_input("Enter you choice: ")
         if choice == "a":
             self_info()
@@ -420,14 +384,10 @@ def main_function():#main function which will start
             insta_username = raw_input("enter username of the user : ")
             get_media_of_your_choice(insta_username)
         elif choice == 'l':
-            print "It would be based on the word Park\n"
             insta_username = raw_input("Enter the username: \n")
             target_comments(insta_username)
-        elif choice == 'n':
-            exit()
         elif choice == 'm':
-            insta_username = raw_input("Enter the username")
-            pie_chart(insta_username)
+            exit()
         else:
             cprint("wrong choice", 'green')
 
